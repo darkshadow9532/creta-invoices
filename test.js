@@ -1,0 +1,1 @@
+const actions = require("app/controllers/action.controller.js");

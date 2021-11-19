@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <!-- Popper JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+        <script src="/js/undercore.js"></script>
+        <script src="/js/backbone.js"></script>
+        <script src="/js/models.js"></script>
+    </head>
+    <body>
+        <div class="alert alert-secondary">
+          <%- include("../templates/menu.ejs") %>
+        </div>
+        <h1>Danh sách hóa đơn</h1>
+        <div class="container">
+
+            <input class="form-control" type="text" id="myInput" onkeyup="myFunction()" placeholder="Tìm mã hóa đơn" title="Type in a name">
+            <table class="table table-bordered" id="myTable">
+                <tr>
+                    <td>Mã Đơn</td>
+                    <td>Tên Khách</td>
+                    <td>Ngày Bán</td>
+                    <td>Chi Tiết</td>
+                    <td>Hành động</td>
+                </tr>
+                <% function parse_date(date){ %>
+                <%    var a = new Date(date); %>
+                <%    return a.toLocaleString(); %>
+                <% } %>
+                <% if (invoices.data){ %>
+                    <% invoices.data.forEach(function(e){ %>
+                <tr >
+                    <td><%= e.code %></td>
+                    <td><%= e.customerName %></td>
+                    <td><%- parse_date(e.createdDate) %></td>
+                    <td><a class="btn btn-success" href="/invoices/detail/<%= e.id %>">Chi Tiết Đơn</a></td>
+                    <td><button class="btn <%- e.actions ? (e.actions.length == 0) ? 'btn-warning' : 'btn-success' : 'btn-warning' %>" onclick="sendSms('/invoices/sms/<%= e.id %>')" <%- e.actions ? (e.actions.length == 0) ? '' : 'disabled' : '' %>>Gửi SMS</button></td>
+                </tr>
+                <%    }) %>
+                <% } %>
+            </table>
+        </div>
+        <script>
+            function myFunction() {
+              var input, filter, table, tr, td, i, txtValue;
+              input = document.getElementById("myInput");
+              filter = input.value.toUpperCase();
+              table = document.getElementById("myTable");
+              tr = table.getElementsByTagName("tr");
+              for (i = 1; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0];
+                if (td) {
+                  txtValue = td.textContent || td.innerText;
+                  if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                  } else {
+                    tr[i].style.display = "none";
+                  }
+                }       
+              }
+            }
+
+            var invoices = <%- JSON.stringify(invoices) %>
+            function sendSms(url){
+              window.location.href= url;
+            }
+            // console.log(invoices); 
+        </script>
+    </body>
+</html>

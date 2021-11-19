@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <!-- Popper JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+        <script src="/js/undercore.js"></script>
+        <script src="/js/backbone.js"></script>
+        <script src="/js/models.js"></script>
+    </head>
+    <body>
+        <div class="alert alert-secondary">
+            <%- include("../templates/menu.ejs") %>
+        </div>
+        <div class="container">
+            <p>Bạn sắp gởi tin nhắn đến số <strong id="pnumber"></strong> với nội dung như sau</p>
+            <div>
+                
+                    <textarea class="form-control" name="msg" id="msg"></textarea>
+                    <input class="form-control" name="to" id="to">
+        
+                <button class="btn btn-warning" id="btn-sms">Gửi tin nhắn</button>
+            </div>  
+        </div>
+        <script>
+            var invoice = <%- JSON.stringify(invoice) %>;
+            var actionName = "SMS";
+            $(document).ready(function(){
+                $("#msg").val("Đơn hàng <%= invoice.code %> đã sẵn sàng tại kho CRETA. Đơn hàng sẽ sớm vận chuyển. Cảm ơn bạn đã ủng hộ CRETA.");
+                $("#to").val("<%= invoice.invoiceDelivery.contactNumber %>")
+                $("#pnumber").html($("#to").val());
+
+                $("#to").keyup(function(){
+                    $("#pnumber").html($("#to").val());
+                })
+
+                
+                $("#btn-sms").click(function(){
+                    var url = "/funcs/sendSMS" + "?to=" + $("#to").val() + "&msg=" + $("#msg").val() + "&invoiceCode=" + invoice.code + "&actionName=" + actionName;
+                    console.log(url);
+                    $.ajax(url,{
+                        method: "GET",
+                        success: function(){
+                            alert("Gui thanh cong");
+                        },
+                        error: function(){
+                            alert("Gui that bai");
+                        }
+
+                    })
+                })
+            })
+        </script>
+    </body>
+</html>

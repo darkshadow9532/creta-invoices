@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <!-- Popper JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+        <script src="/js/undercore.js"></script>
+        <script src="/js/backbone.js"></script>
+        <script src="/js/models.js"></script>
+    </head>
+    <body class="container">
+        <div>
+
+            <input class="form-control" type="text" id="name" placeholder="Nhap ten bang so">
+            <input class="form-control" type="text" id="numberList" placeholder="Nhap bang so">
+            <span class="alert">Nhap so ngan cach boi dau ","</span>
+            <button class="btn btn-danger" id="create_numberList">Tao Moi</button>
+        </div>
+        <script>
+            var id= '<%= id ? id : '1' %>';
+            $(document).ready(function(){
+                var t = new NumberList({id: id});
+                t.fetch({
+                    success: function(res){
+                        console.log("scccc");
+                        $("#name").val(res.get("name"));
+                        $("#numberList").val(res.get("numberList"));
+                    },
+                    error: function(){
+                        console.log("errrr");
+                    }
+                });
+
+                $("#create_numberList").click(function(){
+                    var numberList = new NumberList({id: id});
+                    numberList.save({
+                        name: $("#name").val(),
+                        numberList: $("#numberList").val()
+                    },{error: function(){
+                        alert("That Bai Roi")
+                    }, success: function(){
+                        alert("Thanh Cong Roi");
+                        window.location.href = "/numberList/show";
+                    }
+                        });
+                    // console.log($("#numberList").val())
+                    // console.log($("#name").val())
+                })
+            });
+        </script>
+    </body>
+</html>

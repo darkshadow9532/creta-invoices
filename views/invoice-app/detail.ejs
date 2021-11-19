@@ -1,0 +1,81 @@
+<html>
+    <head>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <!-- Popper JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+        <script src="/js/undercore.js"></script>
+        <script src="/js/backbone.js"></script>
+        <script src="/js/models.js"></script>
+    </head>
+    <body class="container">
+        <div class="alert alert-secondary">
+            <%- include("../templates/menu.ejs") %>
+        </div>
+        <h1>Đơn hàng: <%= invoice.code %></h1>
+        <button class="btn btn-warning" onclick="turnBack()">Trang trước</button>
+        <h2>Khách hàng:</h2>
+        <table class="table table-bordered">
+            <tr>
+               <td>Khách hàng</td>
+               <td><%= invoice.customerName %></td> 
+            </tr>
+            <tr>
+                <td>Điện thoại</td>
+                <td><%= invoice.invoiceDelivery.contactNumber %></td> 
+            </tr>
+            <tr>
+                <td>Địa chỉ	</td>
+                <td><%= invoice.invoiceDelivery.address %></td> 
+             </tr>
+        </table>
+        <h2>Danh sách hàng:</h2>
+        <table class="table table-bordered">
+            <tr>
+               <td>Mã SP</td>
+               <td>Tên SP</td>
+               <td>Số lượng</td>
+               <td>Hình ảnh SP</td>
+               <td>Hành động</td>
+            </tr>
+            <% if(invoice.invoiceDetails){ %>
+            <%  invoice.invoiceDetails.forEach(function(e){ %>
+            <tr>
+                <td><%= e.productCode %></td>
+                <td><%= e.productName %></td>
+                <td><%= e.quantity %></td>
+                <td><a href="/invoices/image/<%= e.productId %>">Xem ảnh</a></td>
+                <td><a href="/invoices/"></a></td>
+            </tr>
+            <% }) %>
+            <% } %>
+            
+        </table>
+        <h1>Các hành động</h1>
+        <table class="table table-bordered">
+            <tr>
+               <td>Gửi SMS</td>
+               <td><button class="btn <%-  invoice.actions ? (invoice.actions.length == 0) ? 'btn-warning' : 'btn-success' : 'btn-warning' %>" onclick="sendSms('/invoices/sms/<%= invoice.id %>')" <%-  invoice.actions ? (invoice.actions.length == 0) ? '' : 'disabled' : '' %>>Gửi SMS</button></td>
+            </tr>
+        </table>
+
+        <script>
+            var invoice = <%- JSON.stringify(invoice) %>
+            function turnBack(){
+                window.history.back();
+            }
+            function sendSms(url){
+              window.location.href= url;
+            }
+        </script>
+    </body>
+</html>

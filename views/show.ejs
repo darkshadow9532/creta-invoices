@@ -1,0 +1,85 @@
+<html>
+    <head>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <!-- Popper JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+        <script src="/js/undercore.js"></script>
+        <script src="/js/backbone.js"></script>
+        <script src="/js/models.js"></script>
+    </head>
+    <body class="container">
+        <div class="alert alert-secondary">   
+          <%- include("templates/menu.ejs") %>
+      </div>
+        <h1>NumberLists</h1>
+        <div>
+            <input class="form-control" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names.." title="Type in a name">
+            <table class="table table-bordered" id="myTable">
+                <tr>
+                    <td>STT</td>
+                    <td>Ten Bang So</td>
+                    <td>Bang So</td>
+                    <td>Sua</td>
+                    <td>Xoa</td>
+                </tr>
+                <% data.forEach(function(e, index){ %>
+                  <tr>
+                      <td><%= index %></td>
+                      <td style="text-align:right" class="table-secondary"><%=  e.name%></td>
+                      <td style="text-align:right" class="table-danger"><%= e.numberList %></td>
+                      <td><button onclick="edit_numberList('<%= e.id %>')">E</button></td>
+                      <td><button onclick="delete_numberList('<%= e.id %>')">X</button></td>
+                  </tr>
+                <% }) %>
+            </table>
+        </div>
+        <script>
+            function myFunction() {
+              var input, filter, table, tr, td, i, txtValue;
+              input = document.getElementById("myInput");
+              filter = input.value.toUpperCase();
+              table = document.getElementById("myTable");
+              tr = table.getElementsByTagName("tr");
+              for (i = 1; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0];
+                if (td) {
+                  txtValue = td.textContent || td.innerText;
+                  if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                  } else {
+                    tr[i].style.display = "none";
+                  }
+                }       
+              }
+            }
+            function edit_numberList(id){
+              // console.log("/numberList/edit/" + id);
+              window.location.href = "/numberList/edit/" + id;
+            }
+            
+            function delete_numberList(id){
+              var t = new NumberList({id: id});
+              t.destroy({
+                success: function(){
+                  alert("Delete Successfully!");
+                  window.location.reload();
+                },
+                error: function(){
+                  alert("Fail to Delete");
+                }
+              })
+            }
+
+            </script>
+    </body>
+</html>
