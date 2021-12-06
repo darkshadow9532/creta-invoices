@@ -30,6 +30,7 @@
                     <td>Mã Đơn</td>
                     <td>Tên Khách</td>
                     <td>Ngày Bán</td>
+                    <td>Trạng thái</td>
                     <td>Chi Tiết</td>
                     <td>Hành động</td>
                 </tr>
@@ -43,8 +44,9 @@
                     <td><%= e.code %></td>
                     <td><%= e.customerName %></td>
                     <td><%- parse_date(e.createdDate) %></td>
+                    <td class="<%- (e.crDeliveryStatus.crDeliveryStatus == 1) ? 'table-danger' : (e.crDeliveryStatus.crDeliveryStatus == 2) ? 'table-warning' : (e.crDeliveryStatus.crDeliveryStatus == 3) ? 'table-primary' : (e.crDeliveryStatus.crDeliveryStatus == 4) ? 'table-info' : (e.crDeliveryStatus.crDeliveryStatus == 5) ? 'table-success' : '' %>"><%= e.crDeliveryStatus.crDeliveryStatusText %></td>
                     <td><a class="btn btn-success" href="/invoices/detail/<%= e.id %>">Chi Tiết Đơn</a></td>
-                    <td><button class="btn <%- e.actions ? (e.actions.length == 0) ? 'btn-warning' : 'btn-success' : 'btn-warning' %>" onclick="sendSms('/invoices/sms/<%= e.id %>')" <%- e.actions ? (e.actions.length == 0) ? '' : 'disabled' : '' %>>Gửi SMS</button></td>
+                    <td><button class="btn <%- e.actions ? (e.actions.length == 0) ? 'btn-warning' : 'btn-success' : 'btn-warning' %>" onclick="sendSms('/invoices/sms/<%= e.id %>')" <%- e.actions ? (e.actions.length == 0) ? '' : 'disabled' : '' %>>SMS</button> | <button class="btn btn-info" onclick="nextStep('<%= e.crDeliveryStatus.invoiceCode %>')" <%- (e.crDeliveryStatus.crDeliveryStatus == 5) ? 'disabled' : ''%>>Đổi TT</button></td>
                 </tr>
                 <%    }) %>
                 <% } %>
@@ -73,6 +75,53 @@
             var invoices = <%- JSON.stringify(invoices) %>
             function sendSms(url){
               window.location.href= url;
+            }
+            function nextStep(code){
+              var url = "/api/deliveryStatuss?invoiceCode=" + code;
+              $.ajax(url, {
+                method: "GET",
+                success: function(data){
+                    // console.log(data);
+                    if (data.length > 0){
+                      var id = data[0].id;
+                      // console.log(id);
+                      var next_status = {
+                        invoiceCode: code,
+                        crDeliveryStatus: data[0].crDeliveryStatus + 1
+                      }
+                      // console.log(next_status);
+                      var stt = new DeliveryStatus({id : id});
+                      // console.log(stt);
+                      stt.save(next_status, {
+                        success: function(){
+                          // console.log("hello");
+                          window.location.reload();
+                        }, err: function(){
+                          alert("Thất bại. Có lỗi gì đó rồi!");
+                        }
+                      });
+                    }
+                    else {
+                      var next_status = {
+                        invoiceCode: code,
+                        crDeliveryStatus: 2
+                      }
+                      console.log(next_status);
+                      var stt = new DeliveryStatus();
+                      stt.save(next_status, {
+                        success: function(){
+                          console.log("hello");
+                          window.location.reload();
+                        }, err: function(){
+                          alert("Thất bại. Có lỗi gì đó rồi!");
+                        }
+                      });
+                    }
+                },
+                error: function(err){
+                    console.log(err);
+                }
+              })
             }
             // console.log(invoices); 
         </script>

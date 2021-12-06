@@ -11,5 +11,5 @@ db.url = dbConfig.url;
 db.tutorials = require("./tutorial.model.js")(mongoose, mongoosePaginate);
 db.numberLists = require("./numberList.model.js")(mongoose, mongoosePaginate);
 db.actions = require("./action.model.js")(mongoose);
-
+db.deliveryStatuss = require("./deliveryStatus.model")(mongoose);
 module.exports = db;

@@ -31,11 +31,11 @@
             </tr>
             <tr>
                 <td>Điện thoại</td>
-                <td><%= invoice.invoiceDelivery.contactNumber %></td> 
+                <td><%- invoice.invoiceDelivery ? invoice.invoiceDelivery.contactNumber : '' %></td> 
             </tr>
             <tr>
                 <td>Địa chỉ	</td>
-                <td><%= invoice.invoiceDelivery.address %></td> 
+                <td><%- invoice.invoiceDelivery ? invoice.invoiceDelivery.address : '' %></td> 
              </tr>
         </table>
         <h2>Danh sách hàng:</h2>
@@ -66,6 +66,10 @@
                <td>Gửi SMS</td>
                <td><button class="btn <%-  invoice.actions ? (invoice.actions.length == 0) ? 'btn-warning' : 'btn-success' : 'btn-warning' %>" onclick="sendSms('/invoices/sms/<%= invoice.id %>')" <%-  invoice.actions ? (invoice.actions.length == 0) ? '' : 'disabled' : '' %>>Gửi SMS</button></td>
             </tr>
+            <tr>
+                <td>Đổi trạng thái</td>
+                <td><button class="btn <%- (invoice.crDeliveryStatus.crDeliveryStatus == 1) ? 'btn-danger' : (invoice.crDeliveryStatus.crDeliveryStatus == 2) ? 'btn-warning' : (invoice.crDeliveryStatus.crDeliveryStatus == 3) ? 'btn-primary' : (invoice.crDeliveryStatus.crDeliveryStatus == 4) ? 'btn-info' : (invoice.crDeliveryStatus.crDeliveryStatus == 5) ? 'btn-success' : '' %>" onclick="nextStep('<%= invoice.crDeliveryStatus.invoiceCode %>')" <%- (invoice.crDeliveryStatus.crDeliveryStatus == 5) ? 'disabled' : ''%>><%- (invoice.crDeliveryStatus.crDeliveryStatus == 1) ? 'Đã soạn hàng' : (invoice.crDeliveryStatus.crDeliveryStatus == 2) ? 'Đã đóng hàng' : (invoice.crDeliveryStatus.crDeliveryStatus == 3) ? 'Đã giao hàng' : (invoice.crDeliveryStatus.crDeliveryStatus == 4) ? 'Khách đã nhận' : (invoice.crDeliveryStatus.crDeliveryStatus == 5) ? 'Khách đã nhận' : '' %></td>
+            </tr>
         </table>
 
         <script>
@@ -75,6 +79,53 @@
             }
             function sendSms(url){
               window.location.href= url;
+            }
+            function nextStep(code){
+              var url = "/api/deliveryStatuss?invoiceCode=" + code;
+              $.ajax(url, {
+                method: "GET",
+                success: function(data){
+                    // console.log(data);
+                    if (data.length > 0){
+                      var id = data[0].id;
+                      // console.log(id);
+                      var next_status = {
+                        invoiceCode: code,
+                        crDeliveryStatus: data[0].crDeliveryStatus + 1
+                      }
+                      // console.log(next_status);
+                      var stt = new DeliveryStatus({id : id});
+                      // console.log(stt);
+                      stt.save(next_status, {
+                        success: function(){
+                          // console.log("hello");
+                          window.location.reload();
+                        }, err: function(){
+                          alert("Thất bại. Có lỗi gì đó rồi!");
+                        }
+                      });
+                    }
+                    else {
+                      var next_status = {
+                        invoiceCode: code,
+                        crDeliveryStatus: 2
+                      }
+                      console.log(next_status);
+                      var stt = new DeliveryStatus();
+                      stt.save(next_status, {
+                        success: function(){
+                          console.log("hello");
+                          window.location.reload();
+                        }, err: function(){
+                          alert("Thất bại. Có lỗi gì đó rồi!");
+                        }
+                      });
+                    }
+                },
+                error: function(err){
+                    console.log(err);
+                }
+              })
             }
         </script>
     </body>
